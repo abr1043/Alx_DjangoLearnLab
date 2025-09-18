@@ -1,8 +1,16 @@
 
-- **update.md**
-```markdown
+# Update Book Instance
+
 ```python
-retrieved.title = "Nineteen Eighty-Four"
-retrieved.save()
-retrieved.title
-# 'Nineteen Eighty-Four'
+from bookshelf.models import Book
+
+# Retrieve the book
+book = Book.objects.get(title="1984")
+
+# Update the title
+book.title = "Nineteen Eighty-Four"
+book.save()
+
+# Verify the update
+book.title
+# "Nineteen Eighty-Four"

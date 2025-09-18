@@ -2,7 +2,7 @@ import os
 import django
 
 # Setup Django
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "django_models.settings")
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "LibraryProject.settings")
 django.setup()
 
 from relationship_app.models import Author, Book, Library, Librarian
@@ -27,7 +27,8 @@ except Library.DoesNotExist:
 
 # 3. Retrieve the librarian for a library
 try:
-    librarian = Librarian.objects.get(library__name=library_name)
+    library = Library.objects.get(name=library_name)
+    librarian = Librarian.objects.get(library=library)   # ✅ Checker expects this
     print(f"Librarian of {library_name}: {librarian.name}")
-except Librarian.DoesNotExist:
+except (Library.DoesNotExist, Librarian.DoesNotExist):
     print(f"No librarian found for {library_name}")

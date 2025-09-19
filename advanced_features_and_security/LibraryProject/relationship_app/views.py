@@ -1,6 +1,6 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import permission_required
-from .models import Book
+from bookshelf.models import Book
 
 # Add Book
 @permission_required("relationship_app.can_add_book", raise_exception=True)

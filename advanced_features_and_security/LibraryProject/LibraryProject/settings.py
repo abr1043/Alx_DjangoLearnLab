@@ -37,11 +37,12 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    "bookshelf", 
+     "relationship_app",
+     "bookshelf",
 ]
 
 # Custom user model
-AUTH_USER_MODEL = "bookshelf.CustomUser"
+AUTH_USER_MODEL = "relationship_app.CustomUser"
 
 # Internationalization
 LANGUAGE_CODE = "en-us"

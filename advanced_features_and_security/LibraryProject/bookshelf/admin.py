@@ -1,9 +1,17 @@
 from django.contrib import admin
-from .models import Book
+from django.contrib.auth.admin import UserAdmin
+from .models import CustomUser
 
-# Custom admin configuration
-@admin.register(Book)
-class BookAdmin(admin.ModelAdmin):
-    list_display = ('title', 'author', 'publication_year')   # show these in the list
-    search_fields = ('title', 'author')                      # search bar for title/author
-    list_filter = ('publication_year',)                      # filter by year
+
+class CustomUserAdmin(UserAdmin):
+    # Show extra fields in admin
+    fieldsets = UserAdmin.fieldsets + (
+        ("Additional Info", {"fields": ("date_of_birth", "profile_photo")}),
+    )
+    add_fieldsets = UserAdmin.add_fieldsets + (
+        ("Additional Info", {"fields": ("date_of_birth", "profile_photo")}),
+    )
+    list_display = ("username", "email", "first_name", "last_name", "date_of_birth", "is_staff")
+
+
+admin.site.register(CustomUser, CustomUserAdmin)

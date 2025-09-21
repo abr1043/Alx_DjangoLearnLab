@@ -23,14 +23,55 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-o7p*)mxkrt4zz=#-xqz44_ph_54*jz(@jiovx@imrs(0hs$8md'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False 
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["127.0.0.1", "localhost", "yourdomain.com"]
 
+# Browser protections
+SECURE_BROWSER_XSS_FILTER = True
+SECURE_CONTENT_TYPE_NOSNIFF = True
+X_FRAME_OPTIONS = "DENY"
+
+# Cookies — require HTTPS in production
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
+
+# HSTS: only enable (and set a long time) after HTTPS is working
+SECURE_HSTS_SECONDS = 0  # set to 31536000 in production once site is HTTPS
+SECURE_HSTS_INCLUDE_SUBDOMAINS = False
+SECURE_HSTS_PRELOAD = False
+
+# Content Security Policy (if using django-csp; see note below)
+# CSP_DEFAULT_SRC = ("'self'",)
+# CSP_FONT_SRC = ("'self'",)
+# CSP_IMG_SRC = ("'self'", "data:")
+# CSP_SCRIPT_SRC = ("'self'",)
+# CSP_STYLE_SRC = ("'self'",)
+
+# Useful: force redirect HTTP -> HTTPS (enable in production)
+SECURE_SSL_REDIRECT = False  # set True behind HTTPS in production
+
+# Use HttpOnly cookies (cannot be accessed by JavaScript)
+CSRF_COOKIE_HTTPONLY = True
+SESSION_COOKIE_HTTPONLY = True
+
+# Set SameSite policy to help mitigate CSRF
+CSRF_COOKIE_SAMESITE = 'Strict'
+SESSION_COOKIE_SAMESITE = 'Strict'
+
+# Logging basic security issues (optional)
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "handlers": {
+        "console": {"class": "logging.StreamHandler"},
+    },
+    "root": {"handlers": ["console"], "level": "WARNING"},
+}
 
 # Application definition
 
-INSTALLED_APPS = [
+INSTALLED_APPS +=s ["csp"]
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -39,7 +80,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
      "relationship_app",
      "bookshelf",
-]
+
 
 # Custom user model
 AUTH_USER_MODEL = "relationship_app.CustomUser"
@@ -51,6 +92,8 @@ USE_I18N = True
 USE_TZ = True
 
 MIDDLEWARE = [
+    MIDDLEWARE.insert(1, "LibraryProject.middleware.CSPHeaderMiddleware")
+    "csp.middleware.CSPMiddleware",
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -60,6 +103,10 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
+CSP_DEFAULT_SRC = ("'self'",)
+CSP_SCRIPT_SRC = ("'self'",)  # add CDNs explicitly if needed
+CSP_STYLE_SRC = ("'self'",)
+CSP_IMG_SRC = ("'self'", "data:")
 ROOT_URLCONF = 'LibraryProject.urls'
 
 TEMPLATES = [

@@ -1,0 +1,34 @@
+<!-- bookshelf/templates/bookshelf/form_example.html -->
+<!doctype html>
+<html>
+<head><meta charset="utf-8"><title>Form example</title></head>
+<body>
+  <h1>Submit Book</h1>
+  <form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Submit</button>
+  </form>
+</body>
+</html>
+<form method="post">
+  {% csrf_token %}
+  <input name="title" />
+  <button>Submit</button>
+</form>
+# bookshelf/views.py (secure create view)
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib.auth.decorators import permission_required
+from .forms import BookForm
+from .models import Book
+
+@permission_required("bookshelf.can_create", raise_exception=True)
+def add_book(request):
+    if request.method == "POST":
+        form = BookForm(request.POST, request.FILES or None)
+        if form.is_valid():
+            form.save()
+            return redirect("book_list")
+    else:
+        form = BookForm()
+    return render(request, "bookshelf/add_book.html", {"form": form})

@@ -40,10 +40,19 @@ INSTALLED_APPS = [
 
  # Third-party apps
     'rest_framework',
-
-    # Your app
+       'rest_framework.authtoken',  # For token authentication
     'api',
 ]
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.TokenAuthentication',  # Enable token authentication
+        'rest_framework.authentication.SessionAuthentication',  # Optional: useful for browsable API
+    ],
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated',  # Require authentication by default
+    ]
+}
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',

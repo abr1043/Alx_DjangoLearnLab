@@ -26,6 +26,7 @@ SECRET_KEY = 'django-insecure-o7p*)mxkrt4zz=#-xqz44_ph_54*jz(@jiovx@imrs(0hs$8md
 DEBUG = False 
 
 ALLOWED_HOSTS = ["127.0.0.1", "localhost", "yourdomain.com"]
+                CSRF_TRUSTED_ORIGINS = ["https://example.com", "https://www.example.com"]
 
 # Browser protections
 SECURE_BROWSER_XSS_FILTER = True
@@ -69,18 +70,65 @@ LOGGING = {
     "root": {"handlers": ["console"], "level": "WARNING"},
 }
 
+# -----------------------------
+# HTTPS & secure cookie settings
+# -----------------------------
+
+# Redirect HTTP -> HTTPS. Set True in production (requires proper TLS termination).
+SECURE_SSL_REDIRECT = True
+
+# HTTP Strict Transport Security (HSTS)
+# Use a small value while testing. After successful deployment set to 31536000 (1 year).
+# WARNING: Setting this to a large value (and enabling preload) will force browsers to use HTTPS.
+SECURE_HSTS_SECONDS = 31536000  # set 0 during initial testing, then 31536000 for production
+SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+SECURE_HSTS_PRELOAD = False  # only set True after you submit to the HSTS preload list
+
+# Browser protection headers
+SECURE_BROWSER_XSS_FILTER = True
+SECURE_CONTENT_TYPE_NOSNIFF = True
+X_FRAME_OPTIONS = "DENY"  # prevents clickjacking
+
+# Ensure session and CSRF cookies are sent only over HTTPS
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
+
+# Prefer HttpOnly for cookies (not accessible to JavaScript)
+SESSION_COOKIE_HTTPONLY = True
+CSRF_COOKIE_HTTPONLY = True
+
+# SameSite policy for cookies (Lax or Strict depending on your cross-site needs)
+SESSION_COOKIE_SAMESITE = "Lax"
+CSRF_COOKIE_SAMESITE = "Lax"
+
+# If you are behind a proxy/load balancer (e.g., nginx), set:
+# NOTE: ensure your proxy sets X-Forwarded-Proto correctly
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+
+# Optional: force HTTPS redirect to include secure host (useful with ALLOWED_HOSTS)
+# SECURE_SSL_REDIRECT = True
+
+# -------------------------------------
+# Notes:
+# - In development (localhost) you may set SECURE_SSL_REDIRECT=False and *_SECURE=False to avoid
+#   HTTPS requirement. Always revert before production.
+# - Use environment variables (os.environ) to toggle these values per-environment.
+# -------------------------------------
+
+
 # Application definition
 
-INSTALLED_APPS +=s ["csp"]
+INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+     'django_extensions', 
      "relationship_app",
      "bookshelf",
-
+]
 
 # Custom user model
 AUTH_USER_MODEL = "relationship_app.CustomUser"
@@ -92,7 +140,6 @@ USE_I18N = True
 USE_TZ = True
 
 MIDDLEWARE = [
-    MIDDLEWARE.insert(1, "LibraryProject.middleware.CSPHeaderMiddleware")
     "csp.middleware.CSPMiddleware",
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -102,6 +149,9 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
+# Insert our custom CSP middleware just after SecurityMiddleware
+MIDDLEWARE.insert(1, "LibraryProject.middleware.CSPHeaderMiddleware")
 
 CSP_DEFAULT_SRC = ("'self'",)
 CSP_SCRIPT_SRC = ("'self'",)  # add CDNs explicitly if needed

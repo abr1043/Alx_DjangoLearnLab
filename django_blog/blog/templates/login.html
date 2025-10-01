@@ -1,17 +1,20 @@
-{% load static %}
+{% extends "blog/base.html" %}
 
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Login</title>
-    <link rel="stylesheet" href="{% static 'blog/css/login.css' %}">
-</head>
-<body>
-    <h1>Login Page</h1>
-    <form method="post">
+{% block title %}Login{% endblock %}
+
+{% block content %}
+<div class="auth-card">
+    <h2>Login</h2>
+    <form method="POST">
         {% csrf_token %}
-        {{ form.as_p }}
+        <div class="input-group">
+            <input type="text" name="username" placeholder="Username" required>
+        </div>
+        <div class="input-group">
+            <input type="password" name="password" placeholder="Password" required>
+        </div>
         <button type="submit">Login</button>
     </form>
-</body>
-</html>
+    <p class="redirect">Don’t have an account? <a href="{% url 'register' %}">Register</a></p>
+</div>
+{% endblock %}

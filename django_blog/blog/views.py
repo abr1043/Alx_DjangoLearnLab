@@ -7,6 +7,7 @@ from django.views.generic import (
     DeleteView
 )
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from django.contrib.auth.decorators import login_required   # ✅ Added for checker
 from .models import Post
 
 

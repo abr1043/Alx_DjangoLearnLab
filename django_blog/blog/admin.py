@@ -1,7 +1,8 @@
-# blog/admin.py
 from django.contrib import admin
-from .models import UserProfile
+from .models import Post
 
-@admin.register(UserProfile)
-class UserProfileAdmin(admin.ModelAdmin):
-    list_display = ("user", "bio")
+@admin.register(Post)
+class PostAdmin(admin.ModelAdmin):
+    list_display = ("title", "author", "published_date")
+    list_filter = ("published_date", "author")
+    search_fields = ("title", "content")

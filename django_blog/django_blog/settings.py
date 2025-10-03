@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
         "blog",
+         "taggit",   # ✅ if using django-taggit
 ]
 
 LOGIN_REDIRECT_URL = "blog:profile"  

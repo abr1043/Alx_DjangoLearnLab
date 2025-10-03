@@ -10,7 +10,9 @@ urlpatterns = [
     path("post/<int:pk>/update/", views.PostUpdateView.as_view(), name="post-update"),
     path("post/<int:pk>/delete/", views.PostDeleteView.as_view(), name="post-delete"),
 
-    # ✅ new routes
+    # ✅ Search
     path("search/", views.post_search, name="post-search"),
-    path("tags/<str:tag_name>/", views.post_by_tag, name="post-by-tag"),
+
+    # ✅ Tags with slug + Class-based view
+    path("tags/<slug:tag_slug>/", views.PostByTagListView.as_view(), name="post-by-tag"),
 ]

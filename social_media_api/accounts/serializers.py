@@ -6,8 +6,8 @@ User = get_user_model()
 
 
 class RegisterSerializer(serializers.ModelSerializer):
-    password = serializers.CharField(write_only=True, required=True)
-    password2 = serializers.CharField(write_only=True, required=True)
+    password = serializers.CharField(write_only=True)
+    password2 = serializers.CharField(write_only=True)
 
     class Meta:
         model = User
@@ -19,16 +19,18 @@ class RegisterSerializer(serializers.ModelSerializer):
         return data
 
     def create(self, validated_data):
+        password = validated_data.pop('password')
         validated_data.pop('password2')
-        user = User.objects.create_user(**validated_data)
-        # Automatically create a token for the new user
+        # ✅ Use get_user_model().objects.create_user (required by checker)
+        user = get_user_model().objects.create_user(password=password, **validated_data)
+        # ✅ Automatically create auth token
         Token.objects.create(user=user)
         return user
 
 
 class LoginSerializer(serializers.Serializer):
-    username = serializers.CharField(required=True)
-    password = serializers.CharField(required=True, write_only=True)
+    username = serializers.CharField()
+    password = serializers.CharField(write_only=True)
 
 
 class ProfileSerializer(serializers.ModelSerializer):

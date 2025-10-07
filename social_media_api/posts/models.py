@@ -1,33 +1,21 @@
 from django.db import models
 from django.conf import settings
-from django.utils import timezone
 
-User = settings.AUTH_USER_MODEL  # string reference is fine in ForeignKey
-
+User = settings.AUTH_USER_MODEL
 
 class Post(models.Model):
     author = models.ForeignKey(User, on_delete=models.CASCADE, related_name='posts')
-    title = models.CharField(max_length=255)
     content = models.TextField()
-    created_at = models.DateTimeField(default=timezone.now, editable=False)
-    updated_at = models.DateTimeField(auto_now=True)
-
-    class Meta:
-        ordering = ['-created_at']
+    created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"{self.title} by {self.author}"
-
+        return f"{self.author.username}: {self.content[:30]}"
 
 class Comment(models.Model):
-    post = models.ForeignKey('posts.Post', on_delete=models.CASCADE, related_name='comments')
-    author = models.ForeignKey(User, on_delete=models.CASCADE, related_name='comments')
-    content = models.TextField()
-    created_at = models.DateTimeField(default=timezone.now, editable=False)
-    updated_at = models.DateTimeField(auto_now=True)
-
-    class Meta:
-        ordering = ['created_at']
+    post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='comments')
+    author = models.ForeignKey(User, on_delete=models.CASCADE)
+    text = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"Comment by {self.author} on {self.post_id}"
+        return f"Comment by {self.author.username} on {self.post.id}"

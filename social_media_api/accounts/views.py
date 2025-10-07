@@ -1,10 +1,7 @@
-from rest_framework import generics, status
+from rest_framework import generics, status, permissions
 from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated
 from django.contrib.auth import get_user_model
-from rest_framework.views import APIView
-
-from .serializers import UserSerializer, RegisterSerializer
+from .serializers import RegisterSerializer
 
 CustomUser = get_user_model()
 
@@ -18,7 +15,7 @@ class RegisterAPIView(generics.CreateAPIView):
 # -------------------- Follow a User --------------------
 class FollowUserAPIView(generics.GenericAPIView):
     queryset = CustomUser.objects.all()
-    permission_classes = [IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated]
 
     def post(self, request, *args, **kwargs):
         username = kwargs.get("username")
@@ -37,7 +34,7 @@ class FollowUserAPIView(generics.GenericAPIView):
 # -------------------- Unfollow a User --------------------
 class UnfollowUserAPIView(generics.GenericAPIView):
     queryset = CustomUser.objects.all()
-    permission_classes = [IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated]
 
     def post(self, request, *args, **kwargs):
         username = kwargs.get("username")
@@ -47,4 +44,7 @@ class UnfollowUserAPIView(generics.GenericAPIView):
             return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
 
         if request.user == user_to_unfollow:
-            return Response({"error": "You ca
+            return Response({"error": "You cannot unfollow yourself"}, status=status.HTTP_400_BAD_REQUEST)
+
+        request.user.following.remove(user_to_unfollow)
+        return Response({"message": f"You unfollowed {username}"}, status=status.HTTP_200_OK)

@@ -37,10 +37,11 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'rest_framework',
-    'rest_framework.authtoken',
-        'accounts',
-        'posts'
+
+    # your apps
+    'accounts',
+    'posts',
+    'notifications',  # ✅ Correctly added as separate apps
 ]
 
 AUTH_USER_MODEL = 'accounts.CustomUser'

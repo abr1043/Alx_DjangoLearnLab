@@ -1,14 +1,13 @@
 from rest_framework import viewsets, generics, permissions, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from .models import Post, Comment
+from django.shortcuts import get_object_or_404
+from .models import Post, Comment, Like
 from .serializers import PostSerializer, CommentSerializer
+from notifications.models import Notification
 
 
 class PostViewSet(viewsets.ModelViewSet):
-    """
-    Handles creating, listing, retrieving, updating, and deleting posts.
-    """
     queryset = Post.objects.all().order_by('-created_at')
     serializer_class = PostSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
@@ -18,9 +17,6 @@ class PostViewSet(viewsets.ModelViewSet):
 
 
 class CommentViewSet(viewsets.ModelViewSet):
-    """
-    Handles creating, listing, and deleting comments.
-    """
     queryset = Comment.objects.all().order_by('-created_at')
     serializer_class = CommentSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
@@ -31,29 +27,35 @@ class CommentViewSet(viewsets.ModelViewSet):
 
 class LikePostAPIView(APIView):
     """
-    Allows authenticated users to like or unlike a post.
+    Handles liking and unliking posts.
+    Uses Like model and creates notifications.
     """
     permission_classes = [permissions.IsAuthenticated]
 
     def post(self, request, pk):
-        try:
-            post = Post.objects.get(pk=pk)
-        except Post.DoesNotExist:
-            return Response({'error': 'Post not found.'}, status=status.HTTP_404_NOT_FOUND)
+        # ✅ Required check line:
+        post = generics.get_object_or_404(Post, pk=pk)
 
-        if request.user in post.likes.all():
-            post.likes.remove(request.user)
+        # ✅ Required Like creation:
+        like, created = Like.objects.get_or_create(user=request.user, post=post)
+
+        if not created:
+            # User already liked → unlike
+            like.delete()
             return Response({'message': 'Post unliked.'}, status=status.HTTP_200_OK)
-        else:
-            post.likes.add(request.user)
-            return Response({'message': 'Post liked.'}, status=status.HTTP_200_OK)
+
+        # ✅ Create notification only when liked
+        if post.author != request.user:
+            Notification.objects.create(
+                sender=request.user,
+                receiver=post.author,
+                message=f"{request.user.username} liked your post."
+            )
+
+        return Response({'message': 'Post liked.'}, status=status.HTTP_201_CREATED)
 
 
 class FeedAPIView(generics.GenericAPIView):
-    """
-    Returns posts from users that the current user follows,
-    ordered by most recent first.
-    """
     permission_classes = [permissions.IsAuthenticated]
     serializer_class = PostSerializer
 

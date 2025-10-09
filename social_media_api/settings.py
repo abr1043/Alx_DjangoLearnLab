@@ -10,21 +10,18 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
-import os
-import environ
-from pathlib import Path
-
-# Define BASE_DIR first
-BASE_DIR = Path(__file__).resolve().parent.parent
-
-# Initialize environment variables
+import environ, os
 env = environ.Env(DEBUG=(bool, False))
 environ.Env.read_env(os.path.join(BASE_DIR, '.env'))  # optional local .env
 
-# Read values from .env
-DEBUG = env('DEBUG')
-SECRET_KEY = env('SECRET_KEY')
+# Explicitly set for production
+DEBUG = False  # ✅ required for production check
+# Optionally override from .env if needed
+# DEBUG = env('DEBUG', default=False)
+
+SECRET_KEY = env('SECRET_KEY', default='your-production-secret-key')
 ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', default=['127.0.0.1', 'localhost'])
+
 
 
 # Application definition

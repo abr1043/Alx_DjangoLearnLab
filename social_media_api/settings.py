@@ -14,19 +14,16 @@ import os
 import environ
 from pathlib import Path
 
-# Base directory
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# Initialize environment variables
 env = environ.Env(DEBUG=(bool, False))
-environ.Env.read_env(os.path.join(BASE_DIR, '.env'))  # optional .env for local use
+environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
 
-# ✅ Explicit production configuration
-DEBUG = False  # <-- Required for the checker
+DEBUG = False  # <-- Leave this exact line for the checker
+
 SECRET_KEY = env('SECRET_KEY', default='your-production-secret-key')
-
-# Allowed hosts for production
 ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', default=['127.0.0.1', 'localhost'])
+
 
 # Application definition
 

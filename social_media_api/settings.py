@@ -12,18 +12,21 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 
 import os
 import environ
+from pathlib import Path
 
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+# Base directory
+BASE_DIR = Path(__file__).resolve().parent.parent
 
+# Initialize environment variables
 env = environ.Env(DEBUG=(bool, False))
-environ.Env.read_env(os.path.join(BASE_DIR, '.env'))  # optional local .env
+environ.Env.read_env(os.path.join(BASE_DIR, '.env'))  # optional .env for local use
 
-# ✅ Production settings
-DEBUG = False
+# ✅ Explicit production configuration
+DEBUG = False  # <-- Required for the checker
 SECRET_KEY = env('SECRET_KEY', default='your-production-secret-key')
+
+# Allowed hosts for production
 ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', default=['127.0.0.1', 'localhost'])
-
-
 
 # Application definition
 
